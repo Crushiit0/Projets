@@ -1,0 +1,354 @@
+import tkinter as tk
+import math as m
+import time as t
+import decimal as d
+from datetime import datetime
+
+KST_JOHN_WALLIS = "John Wallis"
+KST_JAMES_GREGORY = "James Gregory"
+KST_GOTTFRIED_LEIBNIZ = "Gottfried Leibniz"
+KST_LEONHARD_EULER_1 = "Leonhard Euler 1"
+KST_LEONHARD_EULER_2 = "Leonhard Euler 2"
+STR_PI = "3,141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068"
+current_dateTime = ""
+#**********************
+#*** Formules de pi ***
+#**********************
+
+#Formule John Wallis
+def formule_JohnWallis(sNom, res, iter):
+    pi = 2
+    for i in range (1, iter + 1):
+        pi = pi * ((2*i)*(2*i))/((2*i-1)*(2*i+1))
+    incertitude = ((abs(pi-m.pi))/pi) * 100
+    nbdec = m.log(abs(pi-m.pi),10)
+    res.pi = pi
+    res.piexact = m.pi
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+
+#Formule James Gregory
+def formule_JamesGregory(sNom, res, iter):
+    pi = 0
+    for i in range (iter):
+        pi = pi + ((-1)**i)/(2*i+1)
+    pi = pi *4
+    incertitude = ((abs(pi-m.pi))/pi) * 100
+    nbdec = m.log(abs(pi-m.pi),10)
+    res.pi = pi
+    res.piexact = m.pi
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+
+#Formule Gottfried Leibniz:
+def formule_GottfriedLeibniz(sNom, res, iter):
+    pi = 0
+    for i in range (iter):
+        pi = pi + 1/((4*i+1)*(4*i+3))
+    pi = pi * 8
+    incertitude = ((abs(pi-m.pi))/pi) * 100
+    nbdec = m.log(abs(pi-m.pi),10)
+    nbdec += 1
+    res.pi = pi
+    res.piexact = m.pi
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+
+#Formule Leonhard Euler 1
+def formule_LeonhardEuler_1(sNom, res, iter):
+    pi = 0
+    for i in range (1, iter + 1):
+        pi = pi + 6/(i**2)
+    pi = pi ** 0.5
+    incertitude = ((abs(pi-m.pi))/pi) * 100
+    nbdec = m.log(abs(pi-m.pi),10)
+    res.pi = pi
+    res.piexact = m.pi
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+
+#Formule Leonhard Euler 2
+def formule_LeonhardEuler_2(sNom, res, iter, ):
+    pi = 1
+    for i in range (1, iter + 1):
+        pi = pi + (1)/(2*i+1)**2
+    pi = pi ** 0.5
+    pi = pi * 2 * (2 **0.5)
+    incertitude = ((abs(pi-m.pi))/pi) * 100
+    nbdec = m.log(abs(pi-m.pi),10)
+    res.pi = pi
+    res.piexact = m.pi
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+
+#Formule Leonhard Euler 2 avec plus de décimales
+def formule_LeonhardEuler_2_dec(sNom, res, iter, piexact):
+    pi = d.Decimal(1)
+    for i in range (1, iter + 1):
+        pi = d.Decimal(pi) + d.Decimal((1)/(2*i+1)**2)
+    pi = d.Decimal(pi)**d.Decimal(0.5)
+    pi = d.Decimal(pi) * d.Decimal(2) * (d.Decimal(2) **d.Decimal(0.5))
+    incertitude = (abs(d.Decimal(pi)-d.Decimal(piexact))/d.Decimal(pi) * d.Decimal(100))
+    nbdec = m.log(abs(d.Decimal(pi)-d.Decimal(piexact)),10)
+    res.pi = d.Decimal(pi)
+    res.piexact = d.Decimal(piexact)
+    res.incertitude = d.Decimal(incertitude)
+    res.nbdec = nbdec
+
+#Formule Leonhard Euler 1 avec plus de décimales
+def formule_LeonhardEuler_1_dec(sNom, res, iter, piexact):
+    pi = d.Decimal(0)
+    for i in range (1, iter + 1):
+        pi = d.Decimal(pi) + d.Decimal(1)/(d.Decimal(i)**d.Decimal(2))
+    pi = d.Decimal(pi) ** d.Decimal(0.5)
+    pi = d.Decimal(pi) * (d.Decimal(6)**d.Decimal(0.5))
+    incertitude = ((abs(d.Decimal(pi)-d.Decimal(piexact)))/d.Decimal(pi)) * d.Decimal(100)
+    nbdec = m.log(abs(d.Decimal(pi)-d.Decimal(piexact)),10)
+    res.pi = d.Decimal(pi)
+    res.piexact = d.Decimal(piexact)
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+
+#Formule Gottfried Leibniz avec plus de décimales
+def formule_GottfriedLeibniz_dec(sNom, res, iter, piexact):
+    pi = d.Decimal(0)
+    for i in range (iter):
+        pi = d.Decimal(pi) + d.Decimal(1)/((d.Decimal(4)*d.Decimal(i)+d.Decimal(1))*(d.Decimal(4)*d.Decimal(i)+d.Decimal(3)))
+    pi = d.Decimal(pi) * d.Decimal(8)
+    incertitude = ((abs(d.Decimal(pi)-d.Decimal(piexact)))/d.Decimal(pi)) * d.Decimal(100)
+    nbdec = m.log(abs(d.Decimal(pi)-d.Decimal(piexact)),10)
+    res.pi = d.Decimal(pi)
+    res.piexact = d.Decimal(piexact)
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+    
+#Formule James Gregory avec plus de décimales
+def formule_JamesGregory_dec(sNom, res, iter, piexact):
+    pi = d.Decimal(0)
+    for i in range (iter):
+        pi = d.Decimal(pi) + (d.Decimal((-1))**d.Decimal(i))/(d.Decimal(2)*d.Decimal(i)+d.Decimal(1))
+    pi = d.Decimal(pi) *d.Decimal(4)
+    incertitude = ((abs(d.Decimal(pi)-d.Decimal(piexact)))/d.Decimal(pi)) * d.Decimal(100)
+    nbdec = m.log(abs(d.Decimal(pi)-d.Decimal(piexact)),10)
+    res.pi = d.Decimal(pi)
+    res.piexact = d.Decimal(piexact)
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+    
+#Formule John Wallis avec plus de décimales
+def formule_JohnWallis_dec(sNom, res, iter, piexact):
+    pi = d.Decimal(2)
+    for i in range (1, iter + 1):
+        pi = pi * ((d.Decimal(2)*d.Decimal(i))*(d.Decimal(2)*d.Decimal(i)))/((d.Decimal(2)*d.Decimal(i)-d.Decimal(1))*(d.Decimal(2)*d.Decimal(i)+d.Decimal(1)))
+    incertitude = ((abs(d.Decimal(pi)-d.Decimal(piexact)))/pi) * d.Decimal(100)
+    nbdec = m.log(abs(d.Decimal(pi)-d.Decimal(piexact)),10)
+    res.pi = d.Decimal(pi)
+    res.piexact = d.Decimal(piexact)
+    res.incertitude = incertitude
+    res.nbdec = nbdec
+    
+#**********************
+#*** Calcul de pi   ***
+#**********************
+class clsRes:
+    def __init__(self, pi, incertitude, nbdec, pidec, nbdecprec, piexact):
+        self.pi = pi
+        self.incertitude = incertitude
+        self.nbdec = nbdec
+        self.pidec = pidec
+        self.nbdecprec = nbdecprec
+        self.piexact = piexact
+        
+def calcul_de_pi(sCas):
+    # Information
+    lblResultats['text'] = "Calcul de Pi par la formule de " + sCas + " \n" \
+                           + "-" * 75 + "\n" \
+
+    
+    # Initialisation
+    n = entryNumber1.get()
+    #Précision des décimales
+    dec = entryNumber2.get() 
+    # Tester la valeur de n (puissance pour le nombre d'itération)
+    try :
+        n = int(entryNumber1.get())
+    except:
+        lblResultats['text'] = lblResultats['text'] + "\n" \
+                                                    + "La valeur saisie est : '" + str(n) + "'.\n" \
+                                                    + "Elle n'est pas numérique. Par défaut, elle prendra la valeur de 1 000." + str(n) + "\n"
+        n = 1000
+    try :
+        dec = int(entryNumber2.get()) + 1
+        d.getcontext().prec = dec 
+    except:
+        lblResultats['text'] = lblResultats['text'] + "\n" \
+                                                    + "La valeur saisie est : '" + str(dec) + "'.\n" \
+                                                    + "Elle n'est pas numérique. Par défaut, elle prendra la valeur 20." + str(dec) + "\n"
+        dec = 20 + 1
+    if dec > 100+1:
+        lblResultats['text'] = lblResultats['text'] + "\n" \
+                                                    + "La valeur saisie est : '" + str(dec) + "'.\n" \
+                                                    + "Elle est supérieur à la limite. Elle prendra donc la valeur 100." +"\n"
+        dec = 100 + 1
+    d.getcontext().prec = dec
+    piexact = d.Decimal(0.0)
+    piexact = d.Decimal(STR_PI.replace(",", "."))
+    piexact = d.Decimal(piexact)/d.Decimal(1)
+    # Traitement
+    iter = n    # Nombre d'itération
+    start = t.time()  # Temps début
+    
+    res = clsRes(0, 0, 0, 0, 0, 0)
+    
+    if sCas == KST_JOHN_WALLIS:
+        formule_JohnWallis(sCas, res, iter)
+        canImage1.itemconfig(logo1, image=img1)
+        lblDetail['text'] = "La formule de John Wallis ou produit de Wallis exprime π sous la forme d'un produit infini, crée en 1656"
+    elif sCas == KST_JAMES_GREGORY:
+        formule_JamesGregory(sCas, res, iter)
+        canImage1.itemconfig(logo1, image=img2)
+        lblDetail['text'] = "La formule de James Gregory ou série de Gregory-Leibniz exprime π comme le quadruple de la série alternée des inverses des nombres impairs"
+    elif sCas == KST_GOTTFRIED_LEIBNIZ:
+        formule_GottfriedLeibniz(sCas, res, iter)
+        canImage1.itemconfig(logo1, image=img3)
+        lblDetail['text'] = "La formule de Gottfied Leibniz exprime π sous la forme d'une somme infini de l'inverse du produit de deux nombres impairs successifs"
+    elif sCas == KST_LEONHARD_EULER_1:
+        formule_LeonhardEuler_1(sCas, res, iter)
+        canImage1.itemconfig(logo1, image=img4)
+        lblDetail['text'] = "La formule de Leonhard Euler ou problème de Bâle exprime π sous la forme de la racine carée de la somme des inverses des carrés multiplié par racine de 6"
+    elif sCas == KST_LEONHARD_EULER_2:
+        formule_LeonhardEuler_2(sCas, res, iter)
+        canImage1.itemconfig(logo1, image=img5)
+        lblDetail['text'] = "La deuxième formule de Leonhard Euler exprime π sous la forme de racine de 8 multiplié par la racine carrée de l'inverse des carrés des nombres impairs"
+    elif sCas == KST_LEONHARD_EULER_2 +" DEC":
+        formule_LeonhardEuler_2_dec(sCas, res, iter, piexact)
+        canImage1.itemconfig(logo1, image=img5)
+        lblDetail['text'] = "La deuxième formule de Leonhard Euler exprime π sous la forme de racine de 8 multiplié par la racine carrée de l'inverse des carrés des nombres impairs"
+    elif sCas == KST_LEONHARD_EULER_1 +" DEC":
+        formule_LeonhardEuler_1_dec(sCas, res, iter, piexact)
+        canImage1.itemconfig(logo1, image=img4)
+        lblDetail['text'] = "La formule de Leonhard Euler ou problème de Bâle exprime π sous la forme de la racine carée de la somme des inverses des carrés multiplié par racine de 6"
+    elif sCas == KST_GOTTFRIED_LEIBNIZ +" DEC":
+        formule_GottfriedLeibniz_dec(sCas, res, iter, piexact)
+        canImage1.itemconfig(logo1, image=img3)
+        lblDetail['text'] = "La formule de Gottfied Leibniz exprime π sous la forme d'une somme infini de l'inverse du produit de deux nombres impairs successifs"
+    elif sCas == KST_JAMES_GREGORY + " DEC":
+        formule_JamesGregory_dec(sCas, res, iter, piexact)
+        canImage1.itemconfig(logo1, image=img2)
+        lblDetail['text'] = "La formule de James Gregory ou série de Gregory-Leibniz exprime π comme le quadruple de la série alternée des inverses des nombres impairs"
+    elif sCas == KST_JOHN_WALLIS + " DEC":
+        formule_JohnWallis_dec(sCas, res, iter, piexact)
+        canImage1.itemconfig(logo1, image=img1)
+        lblDetail['text'] = "La formule de John Wallis ou produit de Wallis exprime π sous la forme d'un produit infini, crée en 1656"
+    else:
+        print("Non géré")
+    
+
+    end = t.time()
+    # Résultats
+    lblResultats['text'] = lblResultats['text'] + "\n" \
+                                                + "=" * 75 + "\n" \
+                                                + "Nbre itérations   : " + "{:,.0f}".format(n).replace(',', ' ') + " itération(s)\n" \
+                                                + "\nPi calculé        : " + str(res.pi) + "\n" \
+                                                + "\nPi valeur         : " + str(res.piexact) + "\n" \
+                                                + "\nIncertitude       : " + str(res.incertitude) + " %\n" \
+                                                + "\nNbre de décimales : " + str(int(-res.nbdec)) + " chiffre(s) juste(s)\n" \
+                                                + "\nDurée traitement  : " + (f'{(end - start):.3} s')
+    current_dateTime = datetime.now()
+    fichier = open("resultat.txt", "a")
+    fichier.write(str(current_dateTime) + str(":") +"\n")
+    fichier.write(lblResultats['text'] + "\n" + "\n")
+    fichier.write("*" * 76 + "\n")
+    fichier.close()
+
+#**********************
+#*** Tkinter        ***
+#**********************
+KST_LIGNE_1 = 10
+KST_LIGNE_BOUTON_1 = 40
+KST_LIGNE_BOUTON_2 = 70
+KST_LIGNE_BOUTON_3 = 100
+KST_LIGNE_DESC = 130
+KST_LIGNE_DET = 330
+KST_LIGNE_RES = 400
+KST_LIGNE_REF = 950
+
+
+
+fen = tk.Tk()
+fenTaille = str(fen.winfo_screenwidth()) + "x" + str(fen.winfo_screenheight())
+fen.geometry(fenTaille)
+coord_x = fen.winfo_screenwidth()/2 - 375
+
+fen.title("App Pi-Day 2023")
+icone = tk.PhotoImage(file ="Iconepi.png")
+fen.iconphoto(False, icone)
+
+lblnumber1 = tk.Label(fen, text = "Entrez le nombre d'itération")
+lblnumber1.place (x=(coord_x + 0), y = KST_LIGNE_1)
+
+entryNumber1 = tk.Entry(fen, justify="right", width=20)
+entryNumber1.place(x=(coord_x + 180), y = KST_LIGNE_1)
+
+lblnumber2 = tk.Label(fen, text = "Entrez le nombre de décimales")
+lblnumber2.place (x=(coord_x + 425), y = KST_LIGNE_1)
+
+entryNumber2 = tk.Entry(fen, justify="right", width=20)
+entryNumber2.place(x=(coord_x + 625), y = KST_LIGNE_1)
+
+
+lblDescription = tk.Label(fen, text ="Bienvenue sur l'application Pi-Day 2023 du Lycée Albert 1er, réalisé par Léo KHENG.", justify = "left")
+lblDescription.place(x = 750, y = KST_LIGNE_REF)
+
+canImage1 = tk.Canvas(fen, width = 800, height = 300)
+canImage1.place(x=coord_x-50, y = KST_LIGNE_DESC)
+img0 = tk.PhotoImage(file = "IconePiDay.png", master = fen)
+logo1 = canImage1.create_image(500, 100, image=img0)
+img1 = tk.PhotoImage(file = "Formule John Wallis.png", master=fen)
+img2 = tk.PhotoImage(file = "Formule James Gregory.png", master=fen)
+img3 = tk.PhotoImage(file = "Formule Gottfried Leibniz1.png", master=fen)
+img4 = tk.PhotoImage(file = "Formule Leonhard Euler 1.png", master=fen)
+img5 = tk.PhotoImage(file = "Formule Leonhard Euler 2.png", master=fen)
+
+lblDetail = tk.Label(fen, text ="L'application \"App Pi-Day\" permet de calculer une valeur approchée de pi.", justify = "left")
+lblDetail.place(x=coord_x, y = KST_LIGNE_DET)
+
+
+lblResultats = tk.Label(fen, text ="", justify = "left", font = "Courier")
+lblResultats.place(x=coord_x, y = KST_LIGNE_RES)
+
+
+Validate1 = tk.Button(fen, text = KST_JOHN_WALLIS, width = 20,  command = lambda : calcul_de_pi(KST_JOHN_WALLIS))
+Validate1.place(x=(coord_x + 0), y = KST_LIGNE_BOUTON_1)
+
+Validate2 = tk.Button(fen, text = KST_JAMES_GREGORY, width = 20,  command = lambda : calcul_de_pi(KST_JAMES_GREGORY))
+Validate2.place(x=(coord_x + 150), y = KST_LIGNE_BOUTON_1)
+
+Validate3 = tk.Button(fen, text = KST_GOTTFRIED_LEIBNIZ, width = 20,  command = lambda : calcul_de_pi(KST_GOTTFRIED_LEIBNIZ))
+Validate3.place(x=(coord_x + 300), y = KST_LIGNE_BOUTON_1)
+
+Validate4 = tk.Button(fen, text = KST_LEONHARD_EULER_1, width = 20,  command = lambda : calcul_de_pi(KST_LEONHARD_EULER_1))
+Validate4.place(x=(coord_x + 450), y = KST_LIGNE_BOUTON_1)
+
+Validate5 = tk.Button(fen, text = KST_LEONHARD_EULER_2, width = 20,  command = lambda : calcul_de_pi(KST_LEONHARD_EULER_2))
+Validate5.place(x=(coord_x + 600), y = KST_LIGNE_BOUTON_1)
+
+Validate6 = tk.Button(fen, text = KST_JOHN_WALLIS+" DEC", width = 20,  command = lambda : calcul_de_pi(KST_JOHN_WALLIS+" DEC"))
+Validate6.place(x=(coord_x + 0), y = KST_LIGNE_BOUTON_2)
+
+Validate7 = tk.Button(fen, text = KST_JAMES_GREGORY+" DEC", width = 20,  command = lambda : calcul_de_pi(KST_JAMES_GREGORY+" DEC"))
+Validate7.place(x=(coord_x + 150), y = KST_LIGNE_BOUTON_2)
+
+Validate8 = tk.Button(fen, text = KST_GOTTFRIED_LEIBNIZ+" DEC", width = 20,  command = lambda : calcul_de_pi(KST_GOTTFRIED_LEIBNIZ +" DEC"))
+Validate8.place(x=(coord_x + 300), y = KST_LIGNE_BOUTON_2)
+
+Validate9 = tk.Button(fen, text = KST_LEONHARD_EULER_1+" DEC", width = 20,  command = lambda : calcul_de_pi(KST_LEONHARD_EULER_1+" DEC"))
+Validate9.place(x=(coord_x + 450), y = KST_LIGNE_BOUTON_2)
+
+Validate10 = tk.Button(fen, text = KST_LEONHARD_EULER_2+" DEC", width = 20,  command = lambda : calcul_de_pi(KST_LEONHARD_EULER_2+" DEC"))
+Validate10.place(x=(coord_x + 600), y = KST_LIGNE_BOUTON_2)
+
+
+
+
+fen.mainloop()
