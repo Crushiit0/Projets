@@ -1,0 +1,228 @@
+import pyxel, random
+
+
+class Jeu:
+    def __init__(self, L, l):
+        self.L = L
+        self.l = l
+        self.vies = 3
+        self.gold = 0
+        self.niveau = 1
+        pyxel.init(L, l, title="Jeu")
+        pyxel.load("SpaceInvader.pyxres")
+        self.player_x = (self.L - 8) / 2
+        self.player_y = (self.l - 8) / 2
+        self.tir = []
+        self.ennemis_liste = []
+        self.explosions_liste = []
+        self.tir_gauche = []
+        self.tir_droite = []
+        self.goldobj = 10
+        self.framerefresh = 60
+        self.framemin = 1
+        self.maj = True
+        self.boss = False
+        self.vie_boss = 100
+        self.amelioration = False
+        self.boss_x = 55
+        self.boss_y = 30
+        self.compteur = 0
+        pyxel.run(self.update, self.draw)
+
+    def player_mouvement(self):
+        if pyxel.btn(pyxel.KEY_RIGHT) and self.player_x < self.L - 8:
+            self.player_x += 1
+        if pyxel.btn(pyxel.KEY_LEFT) and self.player_x > 0:
+            self.player_x -= 1
+        if pyxel.btn(pyxel.KEY_UP) and self.player_y > 0:
+            self.player_y -= 1
+        if pyxel.btn(pyxel.KEY_DOWN) and self.player_y < self.l - 8:
+            self.player_y += 1
+
+    def player_suppression(self):
+        for ennemi in self.ennemis_liste:
+            if ennemi[0] <= self.player_x + 8 and ennemi[1] <= self.player_y + 8 and ennemi[0] + 8 >= self.player_x and \
+                    ennemi[1] + 8 >= self.player_y:
+                self.ennemis_liste.remove(ennemi)
+                self.vies -= 1
+                self.explosions_creation(self.player_x, self.player_y)
+
+
+
+    def tir_creation(self):
+        if pyxel.btn(pyxel.KEY_SPACE):
+            self.tir.append([self.player_x, self.player_y - 8])
+
+    def tir_mouvment(self):
+        for balles in self.tir:
+            balles[1] -= 1
+            if balles[1] < 12:
+                self.tir.remove(balles)
+
+    def tir_gauche_creation(self):
+        if pyxel.btn(pyxel.KEY_SPACE):
+            self.tir_gauche.append([self.player_x - 3, self.player_y + 4])
+
+    def tir_gauche_mouvment(self):
+        for balles in self.tir_gauche:
+            balles[0] -= 1
+            if balles[1] < -8:
+                self.tir_gauche.remove(balles)
+
+    def tir_droite_creation(self):
+        if pyxel.btn(pyxel.KEY_SPACE):
+            self.tir_droite.append([self.player_x + 7, self.player_y + 4])
+
+    def tir_droite_mouvment(self):
+        for bullet in self.tir_droite:
+            bullet[0] += 1
+            if bullet[1] < -8:
+                self.tir_droite.remove(bullet)
+
+
+
+    def ennemis(self):
+        if (pyxel.frame_count % self.framerefresh == 0):
+            self.ennemis_liste.append([random.randint(0, 120), 0])
+
+    def ennemis_mouvement(self):
+        for ennemi in self.ennemis_liste:
+            ennemi[1] += 1
+            if ennemi[1] > 128:
+                self.ennemis_liste.remove(ennemi)
+
+    def ennemis_suppression(self):
+        for ennemi in self.ennemis_liste:
+            for balles in self.tir:
+                if ennemi[0] <= balles[0] + 1 and ennemi[0] + 8 >= balles[0] and ennemi[1] + 8 >= balles[1]:
+                    try:
+                        self.ennemis_liste.remove(ennemi)
+                        self.gold += 10
+                        self.tir.remove(balles)
+                        self.explosions_creation(ennemi[0], ennemi[1])
+                    except:
+                        pass
+
+        for ennemi in self.ennemis_liste:
+            for balle in self.tir_gauche:
+                if ennemi[0] <= balle[0] + 1 and ennemi[0] + 8 >= balle[0] and ennemi[1] + 8 >= balle[1]:
+                    try:
+                        self.ennemis_liste.remove(ennemi)
+                        self.gold += 10
+                        self.tir_gauche.remove(balle)
+                        self.explosions_creation(ennemi[0], ennemi[1])
+                    except:
+                        pass
+
+        for ennemi in self.ennemis_liste:
+            for bullet in self.tir_droite:
+                if ennemi[0] <= bullet[0] + 1 and ennemi[0] + 8 >= bullet[0] and ennemi[1] + 8 >= bullet[1]:
+                    try:
+                        self.ennemis_liste.remove(ennemi)
+                        self.gold += 10
+                        self.tir_droite.remove(bullet)
+                        self.explosions_creation(ennemi[0], ennemi[1])
+                    except:
+                        pass
+
+
+
+    def explosions_creation(self, x, y):
+        self.explosions_liste.append([x, y, 0])
+
+    def explosions_animation(self):
+        for explosion in self.explosions_liste:
+            explosion[2] += 1
+            if explosion[2] == 12:
+                self.explosions_liste.remove(explosion)
+
+
+
+    def boss_mouvement(self):
+       if self.boss_x - 5 < 16 :
+          self.boss_x += 5
+       if self.boss_x + 5 > 112:
+          self.boss_x -= 5
+       self.boss_x += random.randint(-5, 5)
+       if self.boss_y - 5 < 16:
+          self.boss_y += 5
+       if self.boss_y + 5 > 112:
+          self.boss_y -= 5
+       self.boss_y += random.randint(-5, 5)
+    def boss_degat(self):
+        for balle in self.tir:
+            if self.boss_x - 7 <= balle[0] and self.boss_x + 16 >= balle[0] and self.boss_y + 16 >= balle[1]:
+                    self.tir.remove(balle)
+                    self.vie_boss -= 1
+                    self.compteur += 1
+
+    def draw(self):
+        pyxel.cls(0)
+        if self.maj == True:
+            pyxel.text(2, 2, "Vies: " + str(self.vies), 7)
+            pyxel.text(92, 10, "Niveau: " + str(self.niveau), 7)
+            pyxel.text(92, 2, "Gold: " + str(self.gold), 7)
+            pyxel.blt(self.player_x, self.player_y, 0, 0, 0, 8, 8)
+            for balle in self.tir:
+                pyxel.blt(balle[0], balle[1], 0, 8, 0, 8, 8)
+            for balles in self.tir_gauche:
+                pyxel.rect(balles[0], balles[1], 4, 1, 10)
+            for bullet in self.tir_droite:
+                pyxel.rect(bullet[0], bullet[1], 4, 1, 10)
+            for ennemi in self.ennemis_liste:
+                pyxel.blt(ennemi[0], ennemi[1], 0, 0, 8, 8, 8)
+            for explosion in self.explosions_liste:
+                pyxel.circb(explosion[0] + 4, explosion[1] + 4, 2 * (explosion[2] // 4), 8 + explosion[2] % 3)
+        if self.vies <= 0:
+            pyxel.text(50, 64, "Game Over", 7)
+            self.maj = False
+        if self.gold >= self.goldobj and self.niveau < 6:
+            if self.niveau == 5:
+                self.x = 45
+                self.y = 65
+            self.niveau += 1
+            self.framerefresh -= 20
+            if self.framerefresh <= self.framemin:
+                self.framerefresh = self.framemin
+            self.goldobj += 20
+
+        if self.niveau == 6 and self.vie_boss >0:
+            self.maj = False
+            self.boss = True
+        if self.boss:
+            pyxel.cls(0)
+            pyxel.blt(self.boss_x, self.boss_y, 0, 0, 32, 16, 16)
+            pyxel.rect(13, 5, 100-self.compteur, 5, 8)
+            pyxel.blt(self.player_x, self.player_y, 0, 0, 0, 8, 8)
+            for balle in self.tir:
+                pyxel.blt(balle[0], balle[1], 0, 8, 0, 8, 8)
+        if self.vie_boss <= 0:
+            pyxel.text(45, 60, "You Have Won", 7)
+
+    def update(self):
+        self.player_mouvement()
+        self.tir_creation()
+        self.tir_mouvment()
+        if pyxel.btnr(pyxel.KEY_D) and self.gold >= 40:
+            self.amelioration = True
+            self.gold -= 40
+        if self.amelioration:
+            self.tir_droite_creation()
+            self.tir_droite_mouvment()
+            self.tir_gauche_creation()
+            self.tir_gauche_mouvment()
+        if self.maj == True:
+            self.ennemis()
+            self.ennemis_mouvement()
+            self.player_suppression()
+            self.ennemis_suppression()
+            self.explosions_animation()
+        if self.boss:
+            self.boss_mouvement()
+            self.boss_degat()
+        if self.vie_boss <= 0:
+            self.boss = False
+
+
+
+Jeu(128, 128)
