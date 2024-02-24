@@ -1,0 +1,112 @@
+import pyxel, random
+class CrossyRoad:
+    def __init__(self):
+        pyxel.init(128, 128, title="Crossy Road", fps=30)
+        self.voiture_x = 60
+        self.voiture_y = 120
+        self.vitesse = 1
+        self.vie = True
+        self.ennemis1_liste = []
+        self.ennemis2_liste = []
+        self.ennemis3_liste = []
+        self.fin = False
+        self.victoire = False
+        self.niveau = 1
+        pyxel.run(self.update, self.draw)
+    def deplacment_joueur(self):
+        if pyxel.btnr(pyxel.KEY_RIGHT) and self.voiture_x < 110:
+            self.voiture_x += 9
+        elif pyxel.btnr(pyxel.KEY_LEFT) and self.voiture_x > 9:
+            self.voiture_x -= 9
+        elif pyxel.btnr(pyxel.KEY_UP) and self.voiture_y > 20:
+            self.voiture_y -= 9
+        elif pyxel.btnr(pyxel.KEY_DOWN) and self.voiture_y < 120:
+            self.voiture_y += 9
+
+    def ennemis1(self):
+        if pyxel.frame_count % self.vitesse1 ==0:
+            self.ennemis1_liste.append([0, 93])
+    def ennmis1_deplacement(self):
+        for ennemi in self.ennemis1_liste:
+            ennemi[0] += 3
+    def ennemis1_collision(self):
+        for ennemi in self.ennemis1_liste:
+            if ennemi[0] <= self .voiture_x+8 and ennemi[1] <= self.voiture_y+8 and ennemi[0]+8 >= self.voiture_x and ennemi[1]+8 >= self.voiture_y:
+                self.vie = False
+    def ennemis2(self):
+        if pyxel.frame_count % self.vitesse2 ==0:
+            self.ennemis2_liste.append([0, 48])
+    def ennmis2_deplacement(self):
+        for ennemi in self.ennemis2_liste:
+            ennemi[0] += 3
+    def ennemis2_collision(self):
+        for ennemi in self.ennemis2_liste:
+            if ennemi[0] <= self.voiture_x+8 and ennemi[1] <= self.voiture_y+8 and ennemi[0]+8 >= self.voiture_x and ennemi[1]+8 >= self.voiture_y:
+                self.vie = False
+    def ennemis3(self):
+        if pyxel.frame_count % self.vitesse3 ==0:
+            self.ennemis3_liste.append([128, 57])
+    def ennmis3_deplacement(self):
+        for ennemi in self.ennemis3_liste:
+            ennemi[0] -= 3
+    def ennemis3_collision(self):
+        for ennemi in self.ennemis3_liste:
+            if ennemi[0] <= self.voiture_x+8 and ennemi[1] <= self.voiture_y+8 and ennemi[0]+8 >= self.voiture_x and ennemi[1]+8 >= self.voiture_y:
+                self.vie = False
+    def draw(self):
+        #1ere Route
+        pyxel.rect(0, 101, 128, 1, 7)
+        pyxel.rect(0, 92, 128, 1, 7)
+        #2eme Route
+        pyxel.rect(0, 65, 128, 1, 7)
+        for i in range(0, 121, 20):
+            pyxel.rect(i, 56, 10, 1, 7)
+        pyxel.rect(0, 47, 128, 1, 7)
+        #Ligne Arrivée
+        for y in range(0, 128, 8):
+            pyxel.rect(y, 12, 4, 4, 7)
+        for x in range(4, 128, 8):
+            pyxel.rect(x, 16, 4, 4, 7)
+
+
+        pyxel.text(0, 3, "Speed : " + str(self.vitesse), 7)
+        pyxel.text(87, 3, "Niveau : " + str(self.niveau), 7)
+        pyxel.rect(self.voiture_x, self.voiture_y, 8, 8, 5)
+        for ennemi1 in self.ennemis1_liste:
+            pyxel.rect(ennemi1[0], ennemi1[1], 8, 8, 10)
+        for ennemi2 in self.ennemis2_liste:
+            pyxel.rect(ennemi2[0], ennemi2[1], 8, 8, 4)
+        for ennemi3 in self.ennemis3_liste:
+            pyxel.rect(ennemi3[0], ennemi3[1], 8, 8, 2)
+        if self.fin:
+           pyxel.rect(0, 0, 128, 128, 0)
+           pyxel.text(50, 60, "Game Over", 7)
+        if self.victoire:
+           pyxel.rect(0, 0, 128, 128, 0)
+           pyxel.text(0, 60, "Victory !", 7)
+
+    def update(self):
+        pyxel.cls(0)
+        self.vitesse1 = random.randint(10, 60/self.niveau)
+        self.vitesse2 = random.randint(10, 60/self.niveau)
+        self.vitesse3 = random.randint(10, 60/self.niveau)
+        if self.vie:
+            self.deplacment_joueur()
+            self.ennemis1()
+            self.ennmis1_deplacement()
+            self.ennemis1_collision()
+            self.ennemis2()
+            self.ennmis2_deplacement()
+            self.ennemis2_collision()
+            self.ennemis3()
+            self.ennmis3_deplacement()
+            self.ennemis3_collision()
+        else:
+            self.fin = True
+        if self.voiture_y == 12 and self.niveau < 6 and pyxel.btnr(pyxel.KEY_SPACE):
+            self.niveau += 1
+            self.voiture_x = 60
+            self.voiture_y = 120
+        if self.voiture_y >= 12 and self.niveau > 6:
+            self.victoire = True
+CrossyRoad()
